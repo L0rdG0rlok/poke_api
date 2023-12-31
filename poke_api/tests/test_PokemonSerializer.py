@@ -59,5 +59,44 @@ class PokemonSerializerTestCase(TestCase):
         # Use the Django REST framework's test client to simulate a request
         client = APIClient()
         client.force_authenticate(user=self.user)
-        response = client.post('/api/Pokemon/', data=invalid_data, format='json')
+        response = client.post("/api/Pokemon/", data=invalid_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_validate_method_rejects_more_than_five_pokemon(self):
+        """Test validate method rejects more than five Pokemon for a user"""
+        # Create 5 Pokemon for the user
+        for i in range(5):
+            Pokemon.objects.create(
+                name=f"Pokemon{i}",
+                height=30,
+                weight=40,
+                sprite="pokemon.png",
+                type="Normal",
+                owner=self.user,
+            )
+
+        # Try to create one more Pokemon
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        response = client.post("/api/Pokemon/", data=self.validated_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data)
+
+    def test_validate_method_allows_five_or_fewer_pokemon(self):
+        """Test validate method allows creation if the user has five or fewer Pokemon"""
+        # Create 4 Pokemon for the user
+        for i in range(4):
+            Pokemon.objects.create(
+                name=f"Pokemon{i}",
+                height=30,
+                weight=40,
+                sprite="pokemon.png",
+                type="Normal",
+                owner=self.user,
+            )
+
+        # Try to create one more Pokemon
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        response = client.post("/api/Pokemon/", data=self.validated_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

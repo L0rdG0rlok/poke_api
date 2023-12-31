@@ -56,7 +56,7 @@ class Pokemon(models.Model):
     sprite = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     owner = models.ForeignKey(
-        "UserProfile", on_delete=models.CASCADE, related_name="Pokemon"
+        "UserProfile", on_delete=models.CASCADE, related_name="pokemon"
     )
 
     def __str__(self):

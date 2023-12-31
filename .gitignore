@@ -10,3 +10,5 @@ htmlcov/
 *.pyc
 __pycache__
 
+# VsCode #
+.vscode
