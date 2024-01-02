@@ -1,0 +1,10 @@
+.flake8
+.gitignore
+README.md
+.env
+.coverage
+.vscode
+*.pyc
+__pycache__
+Dockerfile
+.git/
