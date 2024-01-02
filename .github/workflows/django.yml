@@ -1,0 +1,39 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.10.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.10.12
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Test and Generate Coverage Report
+      run: |
+        coverage run manage.py test
+        coverage report
+
+    - name: Build and Push Docker Image
+      run: |
+        echo "$DOCKER_TOKEN" | docker login  -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+        docker build --build-arg DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} -t sharts/poke-api:latest .
+        docker push sharts/poke-api:latest
