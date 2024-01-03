@@ -34,6 +34,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
     steps:
 
     - uses: actions/checkout@v3
@@ -49,5 +51,4 @@ jobs:
       with:
         push: true
         tags: sharts/poke-api:latest
-        secrets: |
-          "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" 
+

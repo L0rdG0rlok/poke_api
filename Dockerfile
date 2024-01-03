@@ -12,10 +12,7 @@ WORKDIR /app
 COPY requirements.txt /app/
 
 # Install any needed packages specified in requirements.txt
-RUN --mount=type=secret,id=DJANGO_SECRET_KEY \
-    pip install --no-cache-dir -r requirements.txt && \
-    cat /run/secrets/DJANGO_SECRET_KEY
-
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container at /app
 COPY . /app/
