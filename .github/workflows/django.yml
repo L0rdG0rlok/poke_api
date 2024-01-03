@@ -50,4 +50,4 @@ jobs:
         push: true
         tags: sharts/poke-api:latest
         secrets: |
-          "DJANGO_SECRET_KEY=${{ secrets.GITHUB_TOKEN }}" 
+          "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" 
