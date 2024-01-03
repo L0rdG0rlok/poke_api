@@ -1,6 +1,9 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12
 
+# Define build argument
+ARG DJANGO_SECRET_KEY
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
