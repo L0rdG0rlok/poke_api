@@ -42,5 +42,4 @@ jobs:
       env:
         DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
-        docker build -t sharts/poke-api:latest .
-        docker push sharts/poke-api:latest
+        echo $DJANGO_SECRET_KEY
