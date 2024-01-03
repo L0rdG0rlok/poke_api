@@ -1,6 +1,12 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12
 
+# Define a build argument for the secret key
+ARG DJANGO_SECRET_KEY
+
+# Print the value of DJANGO_SECRET_KEY during the build
+RUN echo "DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY"
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
