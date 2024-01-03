@@ -11,8 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      DJANGO_SECRET_KEY: "${{ secrets.DJANGO_SECRET_KEY }}"
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
 
     steps:
     - uses: actions/checkout@v3
@@ -45,12 +44,10 @@ jobs:
         username: ${{ secrets.DOCKER_LOGIN }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
-    - name: Build and Push Docker Image
-      env:
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-      run: |
-        echo "Help me Im $DJANGO_SECRET_KEY"
-        docker build --build-arg DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" -t sharts/poke-api:latest .
-        docker push sharts/poke-api:latest
-
-        
+    - name: Build
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        tags: sharts/poke-api:latest
+        secrets: |
+          "DJANGO_SECRET_KEY=${{ secrets.GITHUB_TOKEN }}" 
