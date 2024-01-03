@@ -11,7 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_SECRET_KEY: "${{ secrets.DJANGO_SECRET_KEY }}"
       DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
     steps:
@@ -39,7 +39,8 @@ jobs:
         password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Build and Push Docker Image
+      env:
+        DJANGO_SECRET_KEY: "${{ secrets.DJANGO_SECRET_KEY }}"
       run: |
-        export DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
         docker build -t sharts/poke-api:latest .
         docker push sharts/poke-api:latest
