@@ -40,7 +40,7 @@ jobs:
 
     - name: Build and Push Docker Image
       env:
-        DJANGO_SECRET_KEY: ${{ env.DJANGO_SECRET_KEY }}
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
         docker build -t sharts/poke-api:latest .
         docker push sharts/poke-api:latest
