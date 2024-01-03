@@ -1,10 +1,11 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12
 
+ARG DJANGO_SECRET_KEY
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
 
 # Create and set the working directory
 WORKDIR /app
