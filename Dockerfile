@@ -1,5 +1,8 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12
+FROM python:3.10-alpine
+
+# Set Build Arguments
+ARG DJANGO_SECRET_KEY
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
