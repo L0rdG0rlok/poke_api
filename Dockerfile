@@ -1,9 +1,6 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10-alpine
 
-# Set Build Arguments
-ARG DJANGO_SECRET_KEY
-
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -15,7 +12,9 @@ WORKDIR /app
 COPY requirements.txt /app/
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    --mount=type=secret,id=DJANGO_SECRET_KEY \
+    cat /run/secrets/DJANGO_SERET_KEY
 
 # Copy the current directory contents into the container at /app
 COPY . /app/
