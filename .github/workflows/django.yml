@@ -1,0 +1,116 @@
+name: Django CI
+
+on:
+  push:
+    branches: ["main", "dev_branch"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+env:
+  DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  PROJECT_REGION: ${{ vars.PROJECT_REGION }}
+  CLUSTER_NAME: ${{ vars.CLUSTER_NAME }}
+  NODE_COUNT: ${{ vars.NODE_COUNT }}
+  REPOSITORY_NAME: ${{ vars.REPOSITORY_NAME }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.10.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10.12
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Test and Generate Coverage Report
+        run: |
+          coverage run manage.py test
+          coverage xml
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: Build and Push Docker container
+        run: |
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+          docker build -t us-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/poke-api:latest .
+          docker push us-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/poke-api:latest
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "us-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/poke-api:latest"
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    environment: Dev
+
+    steps:
+      - uses: actions/checkout@v4
+          
+      - name: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v2"
+        with:
+          cluster_name: "${{ env.CLUSTER_NAME }}"
+          location: "${{ env.PROJECT_REGION }}" 
+          project_id: "${{ env.PROJECT_ID }}"
+
+      - name: Create Secret
+        run: |
+          if ! kubectl get secret shartregistrykey; then
+            kubectl create secret docker-registry shartregistrykey \
+            --docker-server="https://us-west1-docker.pkg.dev" \
+            --docker-username=_json_key \
+            --docker-password='${{ secrets.GKE_SA_KEY }}' \
+            --docker-email="stefan.a.hart@gmail.com"
+          else
+            echo "Secret shartregistrykey already exists, skipping creation."
+          fi
+
+      - name: Create deployment/service
+        run: |
+          kubectl apply -f deployment.yaml;
+          kubectl apply -f service.yaml;

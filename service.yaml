@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: poke-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: poke-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000

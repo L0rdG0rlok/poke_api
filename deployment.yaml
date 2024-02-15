@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poke-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poke-api
+  template:
+    metadata:
+      labels:
+        app: poke-api
+    spec:
+      containers:
+      - name: poke-api
+        image: us-west1-docker.pkg.dev/caramel-clock-413804/shart-repo/poke-api:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: '1'
+            memory: '256Mi'
+          requests:
+            cpu: '100m'
+            memory: '128Mi'
+      automountServiceAccountToken: false
+      imagePullSecrets:
+      - name: shartregistrykey

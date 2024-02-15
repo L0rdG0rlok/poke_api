@@ -1,0 +1,16 @@
+.flake8
+.gitignore
+README.md
+.env
+.coverage
+.vscode
+*.pyc
+__pycache__
+Dockerfile
+.git/
+sonar-project.properties
+.venv
+.github/
+deployment.yaml
+service.yaml
+gha*
