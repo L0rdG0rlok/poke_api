@@ -25,5 +25,4 @@ spec:
             cpu: '100m'
             memory: '128Mi'
       automountServiceAccountToken: false
-      imagePullSecrets:
-      - name: shartregistrykey
+
