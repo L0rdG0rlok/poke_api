@@ -8,6 +8,8 @@ metadata:
     prometheus.io/port: "8000"
   labels:
     app: poke-api
+    release: prometheus
+    self-monitor: "true"
 spec:
   type: LoadBalancer
   selector:
