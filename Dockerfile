@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10-alpine
+FROM python:3.12.3-alpine
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
